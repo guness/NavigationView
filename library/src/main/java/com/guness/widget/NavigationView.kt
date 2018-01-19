@@ -107,6 +107,7 @@ class NavigationView : android.support.design.widget.NavigationView {
     fun setFooterView(view: View) {
         removeFooterView()
         mFooter = view
+        (mFooter!!.layoutParams as FrameLayout.LayoutParams?)?.gravity = Gravity.BOTTOM
         addView(mFooter, 0)
     }
 
