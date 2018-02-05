@@ -5,7 +5,7 @@ import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 import android.support.annotation.UiThread
 import android.support.design.internal.NavigationMenuView
-import android.support.v7.widget.TintTypedArray
+import android.support.v4.view.WindowInsetsCompat
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -21,13 +21,13 @@ class NavigationView : android.support.design.widget.NavigationView {
     private var mHeader: View? = null
     private var mFooter: View? = null
     private var mMenuView: NavigationMenuView? = null
+    private var mPaddingTopDefault: Int = 0
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        val a = TintTypedArray.obtainStyledAttributes(context, attrs,
-                R.styleable.NavigationView, defStyleAttr,
-                R.style.Widget_Design_NavigationView)
+
+        val a = context.obtainStyledAttributes(attrs, R.styleable.NavigationView, defStyleAttr, R.style.Widget_Design_NavigationView)
 
         if (a.hasValue(R.styleable.NavigationView_footerLayout)) {
             inflateFooterView(a.getResourceId(R.styleable.NavigationView_footerLayout, 0))
@@ -64,6 +64,17 @@ class NavigationView : android.support.design.widget.NavigationView {
         removeHeaderView()
         mHeader = view
         addView(mHeader, 0)
+        mMenuView?.setPadding(0, 0, 0, mMenuView?.paddingBottom ?: 0)
+    }
+
+    override fun onInsetsChanged(insets: WindowInsetsCompat) {
+        val top = insets.systemWindowInsetTop
+        if (mPaddingTopDefault != top) {
+            mPaddingTopDefault = top
+            if (mHeader == null) {
+                mMenuView?.setPadding(0, mPaddingTopDefault, 0, mMenuView?.paddingBottom ?: 0)
+            }
+        }
     }
 
     @Deprecated("No need to use params", ReplaceWith("#removeHeaderView()"))
@@ -76,6 +87,7 @@ class NavigationView : android.support.design.widget.NavigationView {
         if (mHeader != null) {
             removeView(mHeader)
             mHeader = null
+            mMenuView?.setPadding(0, 0, 0, mMenuView?.paddingBottom ?: 0)
         }
     }
 
