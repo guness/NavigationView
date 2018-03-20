@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="NavigationView">
         <attr name="footerLayout" format="reference" />
+        <attr name="backgroundVideo" format="reference" />
     </declare-styleable>
 </resources>

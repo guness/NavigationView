@@ -1,6 +1,8 @@
 package com.guness.widget
 
 import android.content.Context
+import android.media.MediaPlayer
+import android.net.Uri
 import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 import android.support.annotation.UiThread
@@ -12,6 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.RelativeLayout
+import android.widget.VideoView
 
 /**
  * Created by guness on 17.01.2018.
@@ -20,6 +24,8 @@ class NavigationView : android.support.design.widget.NavigationView {
 
     private var mHeader: View? = null
     private var mFooter: View? = null
+    private var mVideoView: VideoView
+    private var mVideoWrapper: RelativeLayout
     private var mMenuView: NavigationMenuView? = null
     private var mPaddingTopDefault: Int = 0
 
@@ -27,15 +33,48 @@ class NavigationView : android.support.design.widget.NavigationView {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
 
+        mVideoWrapper = RelativeLayout(context, attrs, defStyleAttr)
+        mVideoView = VideoView(context, attrs, defStyleAttr)
+
+        settleVideoView()
+
         val a = context.obtainStyledAttributes(attrs, R.styleable.NavigationView, defStyleAttr, R.style.Widget_Design_NavigationView)
 
         if (a.hasValue(R.styleable.NavigationView_footerLayout)) {
             inflateFooterView(a.getResourceId(R.styleable.NavigationView_footerLayout, 0))
         }
 
+        if (a.hasValue(R.styleable.NavigationView_backgroundVideo)) {
+            val uri = Uri.parse("android.resource://" + context.packageName + "/" + a.getResourceId(R.styleable.NavigationView_backgroundVideo, 0))
+            mVideoView.setVideoURI(uri)
+            mVideoView.visibility = View.VISIBLE
+            mVideoView.start()
+        }
+
         a.recycle()
 
         (mFooter?.layoutParams as FrameLayout.LayoutParams?)?.gravity = Gravity.BOTTOM
+    }
+
+    private fun settleVideoView() {
+
+        mVideoView.setOnPreparedListener { mp: MediaPlayer ->
+            mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
+            mp.isLooping = true
+            mp.setScreenOnWhilePlaying(false)
+        }
+
+        mVideoWrapper.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        mVideoView.visibility = View.GONE
+
+        val layoutParams = RelativeLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        mVideoWrapper.addView(mVideoView, layoutParams)
+
+        addView(mVideoWrapper, 0)
     }
 
     init {
@@ -52,6 +91,16 @@ class NavigationView : android.support.design.widget.NavigationView {
         mHeader = LayoutInflater.from(context).inflate(res, this, false)
         setHeaderView(mHeader!!)
         return mHeader!!
+    }
+
+    /**
+     * Video will be looped. Also video will stretch.
+     */
+    @UiThread
+    fun setVideoBackground(uri: Uri) {
+        mVideoView.setVideoURI(uri)
+        mVideoView.visibility = View.VISIBLE
+        mVideoView.start()
     }
 
     @Deprecated("There can only be one header", ReplaceWith("#setHeaderView(view: View)"))
