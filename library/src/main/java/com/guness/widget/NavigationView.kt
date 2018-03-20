@@ -17,6 +17,7 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.VideoView
 
+
 /**
  * Created by guness on 17.01.2018.
  */
@@ -32,9 +33,6 @@ class NavigationView : android.support.design.widget.NavigationView {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-
-        mVideoWrapper = RelativeLayout(context, attrs, defStyleAttr)
-        mVideoView = VideoView(context, attrs, defStyleAttr)
 
         settleVideoView()
 
@@ -85,6 +83,20 @@ class NavigationView : android.support.design.widget.NavigationView {
                     mMenuView = it as NavigationMenuView
                     mMenuView!!.overScrollMode = View.OVER_SCROLL_NEVER
                 }
+
+        mVideoWrapper = RelativeLayout(context)
+        mVideoView = VideoView(context)
+
+
+        addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+            override fun onViewDetachedFromWindow(v: View?) {
+                mVideoView.stopPlayback()
+            }
+
+            override fun onViewAttachedToWindow(v: View?) {
+                mVideoView.resume()
+            }
+        })
     }
 
     override fun inflateHeaderView(@LayoutRes res: Int): View {
@@ -112,7 +124,7 @@ class NavigationView : android.support.design.widget.NavigationView {
     fun setHeaderView(view: View) {
         removeHeaderView()
         mHeader = view
-        addView(mHeader, 0)
+        addView(mHeader)
         mMenuView?.setPadding(0, 0, 0, mMenuView?.paddingBottom ?: 0)
     }
 
@@ -169,7 +181,7 @@ class NavigationView : android.support.design.widget.NavigationView {
         removeFooterView()
         mFooter = view
         (mFooter!!.layoutParams as FrameLayout.LayoutParams?)?.gravity = Gravity.BOTTOM
-        addView(mFooter, 0)
+        addView(mFooter)
     }
 
     @UiThread
@@ -191,6 +203,14 @@ class NavigationView : android.support.design.widget.NavigationView {
     fun setOnClickListener(@IdRes res: Int, listener: View.OnClickListener) {
         mHeader?.findViewById<View>(res)?.setOnClickListener(listener)
         mFooter?.findViewById<View>(res)?.setOnClickListener(listener)
+    }
+
+    override fun onVisibilityChanged(changedView: View?, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        when (visibility) {
+            View.VISIBLE -> mVideoView.start()
+            View.INVISIBLE, View.GONE -> mVideoView.pause()
+        }
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {

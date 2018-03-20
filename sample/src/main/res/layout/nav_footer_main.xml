@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingEnd="8dp"
+    android:paddingStart="8dp"
+    android:weightSum="3"
+    tools:showIn="@layout/activity_main">
+
+    <TextView
+        android:id="@+id/notificationsView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawablePadding="4dp"
+        android:drawableTop="@drawable/ic_menu_camera"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="@string/app_name"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/preferencesView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawablePadding="4dp"
+        android:drawableTop="@drawable/ic_menu_gallery"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="@string/app_name"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/logoutView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawablePadding="4dp"
+        android:drawableTop="@drawable/ic_menu_slideshow"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="@string/app_name"
+        android:textSize="15sp" />
+</LinearLayout>
